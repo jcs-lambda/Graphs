@@ -1,4 +1,4 @@
-from queue import SimpleQueue
+from queue import LifoQueue
 
 def earliest_ancestor(ancestors, starting_node):
     # create adjacency list mapping each child to their parents
@@ -15,16 +15,16 @@ def earliest_ancestor(ancestors, starting_node):
         # track parentage
         lineages = []
         # initialze queue
-        queue = SimpleQueue()
+        queue = LifoQueue()
         queue.put([starting_node])
-        # begin breadth first search
+        # begin depth first search
         while not queue.empty():
             # get current parentage line
             lineage = queue.get()
             # looking for parents of last child in line
             child = lineage[-1]
-            # if no known parents (not in dictionary or parent list is empty)
-            if child not in parents or not parents[child]:
+            # if no known parents
+            if child not in parents:
                 # store complete lineage
                 lineages.append(lineage)
                 # look no further
