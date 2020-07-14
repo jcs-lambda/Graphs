@@ -52,8 +52,8 @@ class Graph:
             if vertex not in visited:
                 visited.add(vertex)
                 print(vertex)
-                for edge in self.get_neighbors(vertex):
-                    queue.enqueue(edge)
+                for neighbor in self.get_neighbors(vertex):
+                    queue.enqueue(neighbor)
 
     def dft(self, starting_vertex):
         """
@@ -69,8 +69,8 @@ class Graph:
             if vertex not in visited:
                 visited.add(vertex)
                 print(vertex)
-                for edge in self.get_neighbors(vertex):
-                    stack.push(edge)
+                for neighbor in self.get_neighbors(vertex):
+                    stack.push(neighbor)
 
     def dft_recursive(self, starting_vertex, visited = set()):
         """
@@ -82,8 +82,8 @@ class Graph:
         if starting_vertex not in visited:
             visited.add(starting_vertex)
             print(starting_vertex)
-            for edge in self.get_neighbors(starting_vertex):
-                self.dft_recursive(edge, visited)
+            for neighbor in self.get_neighbors(starting_vertex):
+                self.dft_recursive(neighbor, visited)
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -91,7 +91,6 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        paths = []
         visited = set()
         queue = Queue()
         queue.enqueue([starting_vertex])
@@ -100,15 +99,11 @@ class Graph:
             path = queue.dequeue()
             vertex = path[-1]
             if vertex == destination_vertex:
-                paths.append(path)
-                continue
+                return path
             if vertex not in visited:
                 visited.add(vertex)
-                for edge in self.get_neighbors(vertex):
-                    new_path = path + [edge]
-                    queue.enqueue(new_path)
-        
-        return self._min_path(paths)  
+                for neighbor in self.get_neighbors(vertex):
+                    queue.enqueue(path + [neighbor])
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -129,9 +124,8 @@ class Graph:
                 continue
             if vertex not in visited:
                 visited.add(vertex)
-                for edge in self.get_neighbors(vertex):
-                    new_path = path + [edge]
-                    stack.push(new_path)
+                for neighbor in self.get_neighbors(vertex):
+                    stack.push(path + [neighbor])
         
         return self._min_path(paths)
 
@@ -152,9 +146,8 @@ class Graph:
                 paths.append(path)
             elif vertex not in visited:
                 visited.add(vertex)
-                for edge in self.get_neighbors(vertex):
-                    new_path = path + [edge]
-                    recurse(new_path)
+                for neighbor in self.get_neighbors(vertex):
+                    recurse(path + [neighbor])
 
         recurse([starting_vertex])
 
