@@ -1,6 +1,15 @@
+from queue import SimpleQueue
+from random import choice
+from numpy.random import randint
+from numpy import mean
+from names import get_full_name
+
 class User:
     def __init__(self, name):
         self.name = name
+    
+    def __str__(self):
+        return self.name
 
 class SocialGraph:
     def __init__(self):
@@ -45,8 +54,24 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        for _ in range(num_users):
+            self.add_user(get_full_name())
+
+        # Create friendships count
+        while True:
+            num_friends = randint(0, num_users, num_users)
+            if round(mean(num_friends)) == avg_friendships:
+                break
 
         # Create friendships
+        for i in range(self.last_id):
+            uid = i + 1
+            while len(self.friendships[uid]) < num_friends[i]:
+                while True:
+                    friend = choice(list(self.users))
+                    if friend != uid and friend not in self.friendships[uid]:
+                        break
+                self.add_friendship(uid, friend)
 
     def get_all_social_paths(self, user_id):
         """
@@ -58,7 +83,19 @@ class SocialGraph:
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        
+        queue = SimpleQueue()
+        queue.put([user_id])
+        while not queue.empty():
+            path = queue.get()
+            uid = path[-1]
+            if uid not in visited:
+                visited[uid] = path
+
+            for fid in self.friendships[uid]:
+                if fid not in visited:
+                    queue.put(path + [fid])
+        
         return visited
 
 
@@ -68,3 +105,7 @@ if __name__ == '__main__':
     print(sg.friendships)
     connections = sg.get_all_social_paths(1)
     print(connections)
+    # for x in sorted(connections):
+    #     print(x, connections[x])
+    # n = [len(v) for v in connections.values()]
+    # print(mean(n))
