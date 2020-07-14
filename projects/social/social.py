@@ -1,7 +1,5 @@
 from queue import SimpleQueue
 from random import choice
-from numpy.random import randint
-from numpy import mean
 from names import get_full_name
 
 class User:
@@ -37,6 +35,11 @@ class SocialGraph:
         self.users[self.last_id] = User(name)
         self.friendships[self.last_id] = set()
 
+    @property
+    def average_friendships(self):
+        num_friends = [len(v) for v in self.friendships.values()]
+        return sum(num_friends) / len(num_friends) if num_friends else 0
+
     def populate_graph(self, num_users, avg_friendships):
         """
         Takes a number of users and an average number of friendships
@@ -57,21 +60,21 @@ class SocialGraph:
         for _ in range(num_users):
             self.add_user(get_full_name())
 
-        # Create friendships count
-        while True:
-            num_friends = randint(0, num_users, num_users)
-            if round(mean(num_friends)) == avg_friendships:
-                break
-
         # Create friendships
-        for i in range(self.last_id):
-            uid = i + 1
-            while len(self.friendships[uid]) < num_friends[i]:
-                while True:
-                    friend = choice(list(self.users))
-                    if friend != uid and friend not in self.friendships[uid]:
-                        break
-                self.add_friendship(uid, friend)
+        while self.average_friendships < 2:
+            # random user
+            uid = choice(list(self.users))
+
+            # make potential friends list from users,
+            # removing self and any current friends
+            potential_friends = set(self.users)
+            potential_friends.remove(uid)
+            for friend in self.friendships[uid]:
+                potential_friends.remove(friend)
+
+            # add random new friend
+            friend = choice(list(potential_friends))
+            self.add_friendship(uid, friend)
 
     def get_all_social_paths(self, user_id):
         """
@@ -85,6 +88,8 @@ class SocialGraph:
         visited = {}  # Note that this is a dictionary, not a set
         
         queue = SimpleQueue()
+        # for fid in self.friendships[user_id]:
+        #     queue.put([user_id, fid])
         queue.put([user_id])
         while not queue.empty():
             path = queue.get()
@@ -93,7 +98,7 @@ class SocialGraph:
                 visited[uid] = path
 
             for fid in self.friendships[uid]:
-                if fid not in visited:
+                if fid not in visited and fid != user_id:
                     queue.put(path + [fid])
         
         return visited
@@ -107,5 +112,5 @@ if __name__ == '__main__':
     print(connections)
     # for x in sorted(connections):
     #     print(x, connections[x])
-    # n = [len(v) for v in connections.values()]
-    # print(mean(n))
+    # n = [len(v) for v in sg.friendships.values()]
+    # print(sum(n) / len(n))
