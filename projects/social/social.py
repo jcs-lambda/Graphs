@@ -14,6 +14,7 @@ class SocialGraph:
         self.last_id = 0
         self.users = {}
         self.friendships = {}
+        self._add_friend_calls = 0
 
     def add_friendship(self, user_id, friend_id):
         """
@@ -26,6 +27,7 @@ class SocialGraph:
         else:
             self.friendships[user_id].add(friend_id)
             self.friendships[friend_id].add(user_id)
+            self._add_friend_calls += 1
 
     def add_user(self, name):
         """
@@ -56,7 +58,7 @@ class SocialGraph:
             self.add_user(get_full_name())
 
         # Create friendships
-        for _ in range(num_users * avg_friendships):
+        for _ in range(num_users * avg_friendships // 2):
             # random user
             uid = choice(list(self.users))
 
@@ -101,7 +103,15 @@ class SocialGraph:
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
+    sg.populate_graph(1000, 5)
     print(sg.friendships)
-    connections = sg.get_all_social_paths(1)
+    user = 1
+    connections = sg.get_all_social_paths(user)
     print(connections)
+    print(sg._add_friend_calls)
+    print(f'{(len(connections) - 1) / sg.last_id * 100:.2f}%')
+
+    # for x in sorted(connections):
+    #     print(x, connections[x])
+    n = [len(v) for k,v in connections.items() if k != user]
+    print(sum(n) / len(n))
